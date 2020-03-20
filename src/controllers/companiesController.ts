@@ -1,42 +1,58 @@
 import {Company, CompaniesServiceI} from '../core/company';
 import {Socket} from 'socket.io';
-import {SocketController} from './socketController';
+import {
+  SocketController,
+  socketListeners,
+} from './socketRouter';
 import {inject, injectable} from 'inversify';
 import {TYPES} from '../types';
 
 @injectable()
-export class CompaniesController extends SocketController {
+export class CompaniesController implements SocketController {
   private _service: CompaniesServiceI;
+  private _namespace = 'companies';
 
   constructor(
     @inject(TYPES.CompaniesService) issuersService: CompaniesServiceI,
   ) {
-    super('/companies');
     this._service = issuersService;
   }
 
-  addConnectionToPool(socket: Socket, userId: string, role: string) {
-    super.addConnectionToPool(socket, userId, role);
+  get namespace(): string {
+    return this._namespace;
+  }
 
-    switch (role) {
-      case 'A':
-    }
+  getListeners(socket: Socket, userId: string, role: string): socketListeners {
+    // ':list', async () => {
+    //       const list = await this.listItems(userId);
+    //       socket.emit(this._namespace + ':updateList', list);
+    //     }
+    //
+    // socket.on(
+    //   this._namespace + ':list',
+    //   Logger(async () => {
+    //     const list = await this.listItems(userId);
+    //     socket.emit(this._namespace + ':updateList', list);
+    //   }),
+    // );
+    //
+    // socket.on(
+    //   this._namespace + ':retrieve',
+    //   Logger(
+    // );
 
-    socket.on('list', () => {
-      console.log('[SOCKET.IO] : CompaniesController : list request');
-      this.listItems(userId).then(list => {
-        socket.emit('updateList', list);
-        console.log('[SOCKET.IO] : CompaniesController : list response');
-      });
-    });
+    return {
+      list: async () => {
+        const list = await this.listItems(userId);
+        socket.emit(this._namespace + ':updateList', list);
+      },
+      retrieve: async ({id}) => {
+        const data = await this.retrieveItem(userId, id);
+        socket.emit(this._namespace + ':updateDetails', data);
+      },
+    };
 
-    socket.on('retrieve', (id: string) => {
-      console.log('[SOCKET.IO] : CompaniesController : retrieve request');
-      this.retrieveItem(userId, id).then(data => {
-        socket.emit('updateDetails', data);
-        console.log('[SOCKET.IO] : CompaniesController : retrieve response', data);
-      });
-    });
+
   }
 
   createIssuer(id: string, name: string) {
@@ -47,7 +63,7 @@ export class CompaniesController extends SocketController {
     return this._service.findById(userID, id);
   }
 
-  listItems(userId: string): Promise<Company[] | undefined> {
+  async listItems(userId: string): Promise<Company[] | undefined> {
     return this._service.list(userId);
   }
 }

@@ -1,4 +1,4 @@
-import {Entity, PrimaryGeneratedColumn, ManyToOne, OneToMany} from 'typeorm';
+import {Entity, PrimaryGeneratedColumn, ManyToOne, OneToMany, Column} from 'typeorm';
 import {BasicRepositoryI} from './basic';
 import { Company } from './company';
 import {Payment} from "./payments";
@@ -8,6 +8,9 @@ export class Account {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column()
+  userId : string;
+
   @ManyToOne(type => Company, company => company.accounts)
   company: Company;
 
@@ -16,9 +19,6 @@ export class Account {
 
   @OneToMany(type=>Payment, payment => payment.to)
   paymentsTo: Payment[];
-
-
-
 
 }
 

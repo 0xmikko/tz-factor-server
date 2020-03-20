@@ -1,34 +1,74 @@
-import {Column, Entity, PrimaryGeneratedColumn, ManyToOne, OneToMany} from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import {BasicRepositoryI} from '../core/basic';
-import {Company} from "./company";
-import {Payment} from "./payments";
+import {Company} from './company';
+import {Payment} from './payments';
 
 @Entity()
 export class Bond {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(type => Company, company => company.bonds)
+  @ManyToOne(
+    type => Company,
+    company => company.bonds,
+  )
   issuer: Company;
 
   @Column()
   amount: number;
 
   @Column()
-  dateOfPayment: Date;
+  matureDate: Date;
 
-  @OneToMany(type => Payment, payment => payment.bond)
+  @OneToMany(
+    type => Payment,
+    payment => payment.bond,
+  )
   payments: Payment[];
-
-
 }
 
-export interface BondsRepositoryI extends BasicRepositoryI<Bond> {}
+export interface BondCreateDTO {
+  amount: number;
+  matureDate: number;
+  account: string;
+}
+
+export const bondCreateDTOSchema = {
+  type: 'object',
+  required: ['amount', 'matureDate', 'account'],
+  properties: {
+    amount: {
+      type: 'number',
+      minimum: 0,
+    },
+    matureDate: {
+      type: 'number',
+      minimum: Date.now(),
+    },
+    account: {
+      type: 'string',
+      minLength: 5,
+    },
+  },
+};
+
+export interface BondsRepositoryI extends BasicRepositoryI<Bond> {
+  retrieve(id: string): Promise<Bond | undefined>;
+}
 
 export interface BondsServiceI {
   issueBond(userId: string, agreementId: string): void;
 
-  createBond(userId: string, name: string): void;
+  createBond(
+    userId: string,
+    bondCreateDTO: BondCreateDTO,
+  ): Promise<string | undefined>;
   findById(userId: string, id: string): Promise<Bond | undefined>;
   list(userId: string): Promise<Bond[] | undefined>;
   update(userId: string, data: Bond): void;

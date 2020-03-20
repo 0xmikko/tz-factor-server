@@ -51,5 +51,6 @@ export function getConfig() : ConfigParams  {
     return configData
 
 }
+const config = getConfig()
 
-export const config = getConfig()
+export default config;

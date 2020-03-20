@@ -1,7 +1,5 @@
 import {createApp} from './app';
-import {getConfig} from './config/config';
-
-const config = getConfig();
+import config from './config/config';
 
 process.on('uncaughtException', e => {
   console.log(e);

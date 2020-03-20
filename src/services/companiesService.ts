@@ -12,6 +12,7 @@ export class CompaniesService implements CompaniesServiceI {
     ) {
         this._repository = repository;
     }
+
     createSupplier(userId: string, name: string): void {
         throw new Error("Method not implemented.");
     }
