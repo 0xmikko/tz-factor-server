@@ -8,6 +8,7 @@ import {
 import {BasicRepositoryI} from '../core/basic';
 import {Company} from './company';
 import {Payment} from './payments';
+import {BondShare} from "./shares";
 
 @Entity()
 export class Bond {
@@ -25,6 +26,12 @@ export class Bond {
 
   @Column()
   matureDate: Date;
+
+  @OneToMany(
+      type => BondShare,
+      bondshare => bondshare.bond,
+  )
+  shares: BondShare[];
 
   @OneToMany(
     type => Payment,
@@ -49,7 +56,7 @@ export const bondCreateDTOSchema = {
     },
     matureDate: {
       type: 'number',
-      minimum: Date.now(),
+      minimum: 0,
     },
     account: {
       type: 'string',

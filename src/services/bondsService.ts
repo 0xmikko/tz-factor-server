@@ -5,10 +5,9 @@ import {
   BondCreateDTO,
 } from '../core/bonds';
 import {inject, injectable} from 'inversify';
-import {TYPES} from '../types';
-import {v4 as uuidv4} from 'uuid';
 import {getRepository} from 'typeorm';
 import {Account} from '../core/account';
+import {TYPES} from "../types";
 
 @injectable()
 export class BondsService implements BondsServiceI {
@@ -35,7 +34,7 @@ export class BondsService implements BondsServiceI {
         return;
       }
 
-      if (issuer?.userId !== userId) {
+      if (issuer?.id !== userId) {
         reject('Operations with this account forbidden for your id');
         return;
       }
@@ -45,17 +44,17 @@ export class BondsService implements BondsServiceI {
         return;
       }
 
-      const bond = await this._repository.insert({
-        id: uuidv4(),
-        issuer: issuer?.company,
-        matureDate: new Date(dto.matureDate),
-        amount: dto.amount,
-        payments: [],
-      });
+      // const bond = await this._repository.insert({
+      //   id: uuidv4(),
+      //   issuer: issuer?.company,
+      //   matureDate: new Date(dto.matureDate),
+      //   amount: dto.amount,
+      //   payments: [],
+      // });
 
-      console.log(bond);
+      // console.log(bond);
 
-      resolve(bond);
+      resolve("bond");
       return;
     });
   }

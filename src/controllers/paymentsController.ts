@@ -1,4 +1,4 @@
-import {BondCreateDTO, bondCreateDTOSchema, BondsServiceI} from '../core/bonds';
+import {PaymentCreateDTO, paymentCreateDTOSchema, PaymentsServiceI} from '../core/payments';
 import {Socket} from 'socket.io';
 import {SocketController, socketListeners} from './socketRouter';
 import {inject, injectable} from 'inversify';
@@ -7,17 +7,17 @@ import {TYPES} from "../types";
 
 
 @injectable()
-export class BondsController implements SocketController {
-  private _namespace = 'bonds';
-  private _service: BondsServiceI;
+export class PaymentsController implements SocketController {
+  private _namespace = 'payments';
+  private _service: PaymentsServiceI;
 
   private _validate : Ajv.ValidateFunction
 
-  constructor(@inject(TYPES.BondsService) service: BondsServiceI) {
+  constructor(@inject(TYPES.PaymentsService) service: PaymentsServiceI) {
     this._service = service;
 
     const ajv = new Ajv(); // options can be passed, e.g. {allErrors: true}
-    this._validate = ajv.compile(bondCreateDTOSchema);
+    this._validate = ajv.compile(paymentCreateDTOSchema);
 
   }
 
@@ -29,7 +29,8 @@ export class BondsController implements SocketController {
     return {
       // LIST HANDLER
       list: async () => {
-        const list = await this._service.list(userId);
+        const list = await this._service.listByUser(userId);
+        console.log(list);
         socket.emit(this._namespace + ':updateList', list);
       },
 
@@ -41,7 +42,7 @@ export class BondsController implements SocketController {
       },
 
       // CREATE CONTROLLER
-      create: async (dto: BondCreateDTO) => {
+     pay: async (dto: PaymentCreateDTO) => {
         console.log(dto)
 
         const valid = this._validate(dto);
@@ -50,18 +51,24 @@ export class BondsController implements SocketController {
           return
         }
 
-        const result = await this._service.createBond(userId, dto);
+        const result = await this._service.pay(userId, dto);
 
         console.log(result)
 
         if (result) {
           // TODO: BROADCAST
-          const list = await this._service.list(userId);
+          const list = await this._service.listByUser(userId);
           socket.emit(this._namespace + ':updateList', list);
 
           const item = await this._service.findById(userId, result);
           socket.emit(this._namespace + ':updateDetails', item);
         }
+      },
+
+      contractorAccounts: async () => {
+          const accountsList = await this._service.contractorAccounts(userId)
+          console.log(accountsList);
+          socket.emit(this._namespace + ':updateAccountsList', accountsList);
       },
     };
   }

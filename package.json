@@ -6,6 +6,7 @@
   "repository": "git@github.com:MikaelLazarev/tz-factor-server.git",
   "author": "Mikhail Lazarev <mikael.lazarev@gmail.com>",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "dev": "nodemon"
   },

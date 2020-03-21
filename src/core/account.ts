@@ -1,4 +1,4 @@
-import {Entity, PrimaryGeneratedColumn, ManyToOne, OneToMany, Column} from 'typeorm';
+import {Entity, PrimaryGeneratedColumn, ManyToOne, OneToMany} from 'typeorm';
 import {BasicRepositoryI} from './basic';
 import { Company } from './company';
 import {Payment} from "./payments";
@@ -7,9 +7,6 @@ import {Payment} from "./payments";
 export class Account {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  @Column()
-  userId : string;
 
   @ManyToOne(type => Company, company => company.accounts)
   company: Company;
@@ -22,7 +19,9 @@ export class Account {
 
 }
 
-export interface AccountsRepositoryI extends BasicRepositoryI<Account> {}
+export interface AccountsRepositoryI extends BasicRepositoryI<Account> {
+  listAccountsWithCompanies() : Promise<Account[] | undefined>;
+}
 
 export interface AccountsServiceI {
   createSupplier(userId: string, name: string): void;

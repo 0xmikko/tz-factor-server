@@ -2,6 +2,7 @@ import {Column, Entity, PrimaryGeneratedColumn, OneToMany} from 'typeorm';
 import {BasicRepositoryI} from './basic';
 import { Account } from './account';
 import {Bond} from "./bonds";
+import {BondShare} from "./shares";
 
 @Entity()
 export class Company {
@@ -28,6 +29,12 @@ export class Company {
 
   @OneToMany(type => Account, account=> account.company)
   accounts?: Account[];
+
+  @OneToMany(
+      type => BondShare,
+      bondshare => bondshare.bond,
+  )
+  shares: BondShare[];
 }
 
 export interface CompaniesRepositoryI extends BasicRepositoryI<Company> {}
@@ -38,5 +45,4 @@ export interface CompaniesServiceI {
   findById(userId: string, id: string): Promise<Company | undefined>;
   list(userId: string): Promise<Company[] | undefined>;
   update(userId: string, data: Company): void;
-  delete(userId: string, id: string): void;
 }

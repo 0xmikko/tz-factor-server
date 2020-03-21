@@ -1,7 +1,7 @@
-import {Column, Entity, PrimaryGeneratedColumn, ManyToOne, OneToMany} from 'typeorm';
+import {Column, Entity, PrimaryGeneratedColumn, ManyToOne} from 'typeorm';
 import {BasicRepositoryI} from '../core/basic';
 import {Account} from '../core/account';
-import { Bond } from '../core/bonds';
+import {Bond} from '../core/bonds';
 
 @Entity()
 export class Payment {
@@ -11,13 +11,24 @@ export class Payment {
   @Column()
   date: Date;
 
-  @ManyToOne(type => Bond, bond => bond.payments)
+  @ManyToOne(
+    type => Bond,
+    bond => bond.payments,
+  )
   bond: Bond;
 
-  @OneToMany(type=>Account, account => account.paymentsFrom)
+  @ManyToOne(
+    type => Account,
+    account => account.paymentsFrom,
+    {eager: true},
+  )
   from: Account;
 
-  @OneToMany(type=>Account, account => account.paymentsTo)
+  @ManyToOne(
+    type => Account,
+    account => account.paymentsTo,
+    {eager: true},
+  )
   to: Account;
 
   @Column()
@@ -25,19 +36,51 @@ export class Payment {
 
   @Column()
   status: 'SUBMITTED' | 'CONFIRMED';
-
-
-
 }
 
-export interface PaymentsRepositoryI extends BasicRepositoryI<Payment> {}
+export interface PaymentCreateDTO {
+  from: string;
+  to: string;
+  amount: number;
+}
+
+export interface PaymentListItem {
+  id: string;
+  date: Date;
+  amount: number;
+  fromCompany: string;
+  toCompany: string;
+  issuer: string;
+  matureDate: Date;
+  status: string;
+}
+
+export const paymentCreateDTOSchema = {
+  type: 'object',
+  required: ['from', 'to', 'amount'],
+  properties: {
+    amount: {
+      type: 'number',
+      minimum: 0,
+    },
+    from: {
+      type: 'string',
+    },
+    to: {
+      type: 'string',
+    },
+  },
+};
+
+
+export interface PaymentsRepositoryI extends BasicRepositoryI<Payment> {
+  listByUser(userId: string): Promise<PaymentListItem[] | undefined>;
+  retrieve(id: string): Promise<Payment | undefined>;
+}
 
 export interface PaymentsServiceI {
-  issuePayment(userId: string, agreementId: string): void;
-
-  createPayment(userId: string, name: string): void;
+  pay(userId: string, dto: PaymentCreateDTO): Promise<string | undefined>;
   findById(userId: string, id: string): Promise<Payment | undefined>;
-  list(userId: string): Payment[];
-  update(userId: string, data: Payment): void;
-  delete(userId: string, id: string): void;
+  listByUser(userId: string): Promise<PaymentListItem[] | undefined>;
+  contractorAccounts(userId: string): Promise<Account[] | undefined>;
 }

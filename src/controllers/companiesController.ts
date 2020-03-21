@@ -5,7 +5,7 @@ import {
   socketListeners,
 } from './socketRouter';
 import {inject, injectable} from 'inversify';
-import {TYPES} from '../types';
+import {TYPES} from "../types";
 
 @injectable()
 export class CompaniesController implements SocketController {

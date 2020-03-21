@@ -4,10 +4,11 @@ import cors from 'cors';
 import {createConnection} from 'typeorm';
 import {CompaniesController} from './controllers/companiesController';
 import {morganLogger} from './middleware/logger';
-import {TYPES} from './types';
 import container from './config.inversify';
 import {SocketRouter} from './controllers/socketRouter';
 import {BondsController} from './controllers/bondsController';
+import {TYPES} from "./types";
+import {PaymentsController} from "./controllers/paymentsController";
 
 export async function createApp(config: ConfigParams): Promise<Application> {
   // Connecting Database
@@ -38,12 +39,6 @@ export async function createApp(config: ConfigParams): Promise<Application> {
 
   app.use(morganLogger);
 
-  app.get('/a/', (req, res) => {
-    console.log('QQQ');
-    res.status(200);
-    res.send('Q-dQ');
-  });
-
   let server = require('http').Server(app);
 
   // set up socket.io and bind it to our
@@ -57,9 +52,14 @@ export async function createApp(config: ConfigParams): Promise<Application> {
     const bondsController = container.get<BondsController>(
       TYPES.BondsController,
     );
+    const paymentsController = container.get<PaymentsController>(
+        TYPES.PaymentsController,
+    );
+
     const socketRouter = new SocketRouter([
       companiesController,
       bondsController,
+      paymentsController
     ]);
     socketRouter.connect(io);
   } catch (e) {
