@@ -1,29 +1,3 @@
-type bond is record [
-    issuer: address;
-    total: nat;
-    matureDate: timestamp;
-    balance: map(address, nat);
-]
-
-type bondIssueParameter is record [
-    total: nat;
-    matureDate: timestamp;
-]
-
-type transferMoneyParameters is record [
-    recepient: address;
-    value: nat;
-]
-
-type storage is record [
-    owner: address;
-    balance: map(address, nat);
-    issuers: map(address, bool);
-    bonds: list(bond);
-]
-
-
-type return is list (operation) * storage
 
 
 const ownerAddress : address =

@@ -1,20 +1,23 @@
+type bond is record [
+    issuer: address;
+    total: nat;
+    matureDate: timestamp;
+    balance: map(address, nat);
+]
+
+type storage is record [
+    owner: address;
+    balance: map(address, nat);
+    issuers: map(address, bool);
+    bonds: map(nat, bond);
+]
+
+type return is list (operation) * storage
+
 #include "./permissions.ligo"
 #include "./bond.ligo"
+#include "./coin.ligo"
 #include "./admin.ligo"
-
-// =============== USERS OPERATIONS =============
-function transferMoney(const tParams: transferMoneyParameters; var store: storage) : return is block{
-    checkSenderIsUser(store);
-    checkIsUser(tParams.recepient, store);
-    case store.balance[Tezos.sender] of 
-        Some(value) -> block {
-            if value < tParams.value then failwith ("Not enought money to transfer")
-            else skip;
-        }
-        | None -> failwith ("Not enought money to transfer")
-    end
-
-} with ((nil : list (operation)), store)
 
 
 // ============ MAIN FUNCTION
@@ -22,13 +25,17 @@ function transferMoney(const tParams: transferMoneyParameters; var store: storag
 type parameter is 
   RegisterUser of address 
 | RegisterIssuer of address
-| AddStableCoints of nat
-| IssueBond of bondIssueParameter;
+| IssueCoins of nat
+| TransferMoney of transferMoneyParameters
+| IssueBond of bondIssueParameter
+| TransferBonds of transferBondParameters;
 
 function main (const action: parameter; var store: storage) : return is 
   case action of
     RegisterUser (account) -> registerNewUserAccount (account, store)
   | RegisterIssuer (account) -> registerNewIssuerAccount (account, store)
-  | AddStableCoints (amountToAdd) -> addStableCoins(amountToAdd, store)
+  | IssueCoins (amountToAdd) -> addStableCoins(amountToAdd, store)
+  | TransferMoney (tParams) -> transferMoney (tParams, store)
   | IssueBond (bondParams) -> issueBond (bondParams, store)
+  | TransferBonds (transferBondsParams) -> transferBonds (transferBondsParams, store)
   end
