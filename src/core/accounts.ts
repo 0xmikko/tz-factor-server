@@ -1,4 +1,4 @@
-import {Entity, ManyToOne, OneToMany, PrimaryColumn} from 'typeorm';
+import {Column, Entity, ManyToOne, OneToMany, PrimaryColumn} from 'typeorm';
 import {BasicRepositoryI} from './basic';
 import { Company } from './company';
 import {Payment} from "./payments";
@@ -7,6 +7,9 @@ import {Payment} from "./payments";
 export class Account {
   @PrimaryColumn()
   id: string;
+
+  // @Column({type: 'int64'})
+  // amount: number;
 
   @ManyToOne(type => Company, company => company.accounts)
   company: Company;
