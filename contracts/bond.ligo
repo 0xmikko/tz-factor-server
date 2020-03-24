@@ -11,6 +11,11 @@ type transferBondParameters is record [
     recepient: address;
 ]
 
+type executeBondParameters is record [
+    bondIndex: nat;
+    value: nat;
+]
+
 // ============ BOND ISSUERS OPERATIONS
 
 function issueBond(const newBondParam: bondIssueParameter; var store: storage) : return is block{
@@ -45,12 +50,34 @@ function transferBonds(const tParams: transferBondParameters; var store : storag
     checkSenderIsUser(store);
     checkIsUser(tParams.recepient, store);
     const b : bond = getBondByIndex(tParams.bondIndex, store.bonds);
-    const ownerBalance : nat = getBondsAmount(b, Tezos.sender);
-    if ownerBalance < tParams.value then failwith ("Not enough bonds on account"); else skip;
+    const ownerBondBalance : nat = getBondsAmount(b, Tezos.sender);
+    if ownerBondBalance < tParams.value then failwith ("Not enough bonds on account"); else skip;
     const recepientBalance : nat = getBondsAmount(b, tParams.recepient);
-    b.balance[Tezos.sender] := abs(ownerBalance - tParams.value);
+    b.balance[Tezos.sender] := abs(ownerBondBalance - tParams.value);
     b.balance[tParams.recepient] := recepientBalance + tParams.value;
     store.bonds[tParams.bondIndex] := b;
 }  with ((nil : list (operation)), store)
 
+// ExecuteBond
+function executeBond(const tParams: executeBondParameters; var store : storage) : return is block{
+    checkSenderIsUser(store);
 
+    const b : bond = getBondByIndex(tParams.bondIndex, store.bonds);
+    if b.matureDate > Tezos.now then failwith ("You cant execute bond before mature date"); else skip;
+
+    const ownerBondBalance : nat = getBondsAmount(b, Tezos.sender);
+    const issuerBondBalance : nat = getBondsAmount(b, b.issuer);
+    if ownerBondBalance < tParams.value then failwith ("Not enough bonds on account"); else skip;
+
+    const ownerCoinBalance : nat = mustGetBalance(Tezos.sender, store);
+    const issuerCoinBalance : nat = mustGetBalance(b.issuer, store);
+    if issuerCoinBalance < tParams.value then failwith ("Not enought money on issuer account. Technical default!"); else skip;
+
+    store.balance[b.issuer] := abs(issuerCoinBalance - tParams.value);
+    store.balance[Tezos.sender] := ownerCoinBalance + tParams.value;
+
+    b.balance[Tezos.sender] := abs(ownerBondBalance - tParams.value);
+    b.balance[b.issuer] := issuerBondBalance + tParams.value;
+    store.bonds[tParams.bondIndex] := b;
+
+}  with ((nil : list (operation)), store)

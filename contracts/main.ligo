@@ -15,8 +15,8 @@ type storage is record [
 type return is list (operation) * storage
 
 #include "./permissions.ligo"
-#include "./bond.ligo"
 #include "./coin.ligo"
+#include "./bond.ligo"
 #include "./admin.ligo"
 
 
@@ -28,7 +28,8 @@ type parameter is
 | IssueCoins of nat
 | TransferMoney of transferMoneyParameters
 | IssueBond of bondIssueParameter
-| TransferBonds of transferBondParameters;
+| TransferBonds of transferBondParameters
+| ExecuteBond of executeBondParameters;
 
 function main (const action: parameter; var store: storage) : return is 
   case action of
@@ -38,4 +39,6 @@ function main (const action: parameter; var store: storage) : return is
   | TransferMoney (tParams) -> transferMoney (tParams, store)
   | IssueBond (bondParams) -> issueBond (bondParams, store)
   | TransferBonds (transferBondsParams) -> transferBonds (transferBondsParams, store)
+  | ExecuteBond (executeBondParameters) -> executeBond (executeBondParameters, store)
+  
   end
