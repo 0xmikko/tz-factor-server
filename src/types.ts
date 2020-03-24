@@ -1,7 +1,10 @@
 // TYPES
 export const TYPES = {
     // ACCOUNT
+
+    AccountsController: Symbol.for("AccountsController"),
     AccountsRepository: Symbol.for("AccountsRepository"),
+    AccountsService: Symbol.for("AccountsService"),
     // COMPANIES
     CompaniesController: Symbol.for("CompaniesController"),
     CompaniesRepository: Symbol.for("CompaniesRepository"),

@@ -6,37 +6,33 @@ import {
 } from '../core/payments';
 import {inject, injectable} from 'inversify';
 import {getRepository} from 'typeorm';
-import {Account, AccountsRepositoryI} from '../core/account';
-import {Bond} from "../core/bonds";
+import {Account} from '../core/accounts';
 import {TYPES} from "../types";
+import {Bond} from "../core/bonds";
 
 @injectable()
 export class PaymentsService implements PaymentsServiceI {
   private _repository: PaymentsRepositoryI;
-  private _accountsRepository: AccountsRepositoryI;
 
   public constructor(
     @inject(TYPES.PaymentsRepository) repository: PaymentsRepositoryI,
-    @inject(TYPES.AccountsRepository) accountsRepository: AccountsRepositoryI,
   ) {
     this._repository = repository;
-    this._accountsRepository = accountsRepository;
   }
 
   pay(userId: string, dto: PaymentCreateDTO): Promise<string | undefined> {
     return new Promise<string>(async (resolve, reject) => {
 
-      const fromAccount = await getRepository<Account>(Account).findOne(dto.to,
-          {relations: ['company, shares']});
+      const fromAccount = await getRepository<Account>(Account).findOne(dto.from,
+          {relations: ['company']});
 
       const toAccount = await getRepository<Account>(Account).findOne(dto.to,
           {relations: ['company']});
 
-      const bond = await getRepository<Bond>(Bond).findOne(dto.to,
-          {relations: ['company', 'shares'], });
+      const bond = await getRepository<Bond>(Bond).findOne(dto.bond,
+          {relations: ['issuer', 'shares'], });
 
       console.log(fromAccount, toAccount, bond);
-
 
       // if (!toCompany) {
       //   reject("Can't find account");
@@ -76,8 +72,5 @@ export class PaymentsService implements PaymentsServiceI {
     return this._repository.retrieve(id);
   }
 
-  contractorAccounts(userId: string): Promise<Account[] | undefined>  {
-    return this._accountsRepository.listAccountsWithCompanies()
-  }
 
 }

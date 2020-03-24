@@ -6,7 +6,7 @@ import {
 } from '../core/bonds';
 import {inject, injectable} from 'inversify';
 import {getRepository} from 'typeorm';
-import {Account} from '../core/account';
+import {Account} from '../core/accounts';
 import {TYPES} from "../types";
 
 @injectable()

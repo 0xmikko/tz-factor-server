@@ -15,12 +15,17 @@ import {PaymentsService} from "./services/paymentsService";
 import {PaymentsRepository} from "./repository/paymentsRepository";
 import {PaymentsController} from "./controllers/paymentsController";
 import {TYPES} from "./types";
-import {AccountsRepositoryI} from "./core/account";
+import {AccountsRepositoryI, AccountsServiceI} from "./core/accounts";
 import {AccountsRepository} from "./repository/accountsRepository";
+import {AccountsController} from "./controllers/accountsController";
+import {AccountsService} from "./services/accountsService";
 
 let container = new Container();
 
+// ACCOUNTS
 container.bind<AccountsRepositoryI>(TYPES.AccountsRepository).to(AccountsRepository);
+container.bind<AccountsServiceI>(TYPES.AccountsService).to(AccountsService);
+container.bind<AccountsController>(TYPES.AccountsController).to(AccountsController);
 
 // COMPANIES
 container.bind<CompaniesRepositoryI>(TYPES.CompaniesRepository).to(CompaniesRepository);

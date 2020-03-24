@@ -1,6 +1,6 @@
 import {TypeORMRepository} from './typeORMRepository';
 import {injectable} from 'inversify';
-import {Account} from "../core/account";
+import {Account} from "../core/accounts";
 import {getManager} from "typeorm";
 
 @injectable()

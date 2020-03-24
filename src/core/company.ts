@@ -1,6 +1,6 @@
 import {Column, Entity, PrimaryGeneratedColumn, OneToMany} from 'typeorm';
 import {BasicRepositoryI} from './basic';
-import { Account } from './account';
+import { Account } from './accounts';
 import {Bond} from "./bonds";
 import {BondShare} from "./shares";
 

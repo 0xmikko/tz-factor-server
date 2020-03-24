@@ -9,6 +9,7 @@ import {SocketRouter} from './controllers/socketRouter';
 import {BondsController} from './controllers/bondsController';
 import {TYPES} from "./types";
 import {PaymentsController} from "./controllers/paymentsController";
+import {AccountsController} from "./controllers/accountsController";
 
 export async function createApp(config: ConfigParams): Promise<Application> {
   // Connecting Database
@@ -21,7 +22,7 @@ export async function createApp(config: ConfigParams): Promise<Application> {
         rejectUnauthorized: false,
       },
       entities: [
-          'build/core/*.js',
+          // 'build/core/*.js',
        'src/core/*.ts'
       ],
     });
@@ -46,6 +47,10 @@ export async function createApp(config: ConfigParams): Promise<Application> {
   let io = require('socket.io').listen(server, {origins: '*:*'});
 
   try {
+
+    const accountsController = container.get<AccountsController>(
+        TYPES.AccountsController,
+    );
     const companiesController = container.get<CompaniesController>(
       TYPES.CompaniesController,
     );
@@ -57,6 +62,7 @@ export async function createApp(config: ConfigParams): Promise<Application> {
     );
 
     const socketRouter = new SocketRouter([
+        accountsController,
       companiesController,
       bondsController,
       paymentsController

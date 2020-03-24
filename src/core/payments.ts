@@ -1,6 +1,6 @@
 import {Column, Entity, PrimaryGeneratedColumn, ManyToOne} from 'typeorm';
 import {BasicRepositoryI} from '../core/basic';
-import {Account} from '../core/account';
+import {Account} from '../core/accounts';
 import {Bond} from '../core/bonds';
 
 @Entity()
@@ -39,6 +39,7 @@ export class Payment {
 }
 
 export interface PaymentCreateDTO {
+  bond: string
   from: string;
   to: string;
   amount: number;
@@ -82,5 +83,4 @@ export interface PaymentsServiceI {
   pay(userId: string, dto: PaymentCreateDTO): Promise<string | undefined>;
   findById(userId: string, id: string): Promise<Payment | undefined>;
   listByUser(userId: string): Promise<PaymentListItem[] | undefined>;
-  contractorAccounts(userId: string): Promise<Account[] | undefined>;
 }

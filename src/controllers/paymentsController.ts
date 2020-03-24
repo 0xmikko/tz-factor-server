@@ -37,8 +37,13 @@ export class PaymentsController implements SocketController {
       // RETRIEVE HANDLER
       retrieve: async (id: string) => {
         console.log(id)
-        const item = await this._service.findById(userId, id);
-        socket.emit(this._namespace + ':updateDetails', item);
+          try {
+              const item = await this._service.findById(userId, id);
+              socket.emit(this._namespace + ':updateDetails', item);
+          }
+          catch (e) {
+              console.log('Cant find payemnt with id', id, e);
+          }
       },
 
       // CREATE CONTROLLER
@@ -65,11 +70,6 @@ export class PaymentsController implements SocketController {
         }
       },
 
-      contractorAccounts: async () => {
-          const accountsList = await this._service.contractorAccounts(userId)
-          console.log(accountsList);
-          socket.emit(this._namespace + ':updateAccountsList', accountsList);
-      },
     };
   }
 }
