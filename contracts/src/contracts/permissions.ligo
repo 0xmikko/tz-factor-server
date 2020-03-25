@@ -1,15 +1,10 @@
 
-
-const ownerAddress : address =
-  ("tz1TGu6TN5GSez2ndXXeDX6LgUDvLzPLqgYV" : address)
-
-
 // =========== PERMISSONS ===================================
 
 // CheckOwnerAccerss checks that sender is contract owner
 // If not throw exception
-function checkSenderIsOwner (const p: unit) : unit is 
-  if Tezos.sender =/= ownerAddress 
+function checkSenderIsOwner (const store: storage) : unit is 
+  if Tezos.sender =/= store.owner
     then (failwith ("Sorry, only contract owner could invoke this method") : unit);
     else Unit;
 

@@ -9,6 +9,7 @@
   },
   "scripts": {
     "deploy": "npx ts-node ./src/deploy.ts",
+    "invoke": "npx ts-node ./src/invoke.ts",
     "keys": "npx ts-node ./src/keys.ts"
   }
 }
