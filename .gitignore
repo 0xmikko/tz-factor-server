@@ -106,3 +106,4 @@ src/config/dev_db.json
 build/
 src/config/config.json
 ormconfig.json
+/contracts/src/keys.json

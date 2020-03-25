@@ -33,6 +33,7 @@ type parameter is
 
 function main (const action: parameter; var store: storage) : return is 
   case action of
+  
     RegisterUser (account) -> registerNewUserAccount (account, store)
   | RegisterIssuer (account) -> registerNewIssuerAccount (account, store)
   | IssueCoins (amountToAdd) -> addStableCoins(amountToAdd, store)
@@ -40,5 +41,5 @@ function main (const action: parameter; var store: storage) : return is
   | IssueBond (bondParams) -> issueBond (bondParams, store)
   | TransferBonds (transferBondsParams) -> transferBonds (transferBondsParams, store)
   | ExecuteBond (executeBondParameters) -> executeBond (executeBondParameters, store)
-  
+
   end
