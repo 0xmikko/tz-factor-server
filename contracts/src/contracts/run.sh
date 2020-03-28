@@ -23,5 +23,6 @@ ligo dry-run main.ligo --syntax pascaligo main --sender=tz1KqTpEZ7Yob7QbPE4Hy4Wo
                 (\"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" : address) -> 10n;
                 ]
         ];
-    ] 
+    ];
+    events= (nil : list(transferEvent)); 
      ]"

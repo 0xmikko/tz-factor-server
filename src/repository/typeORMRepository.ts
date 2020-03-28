@@ -38,6 +38,12 @@ export class TypeORMRepository<T> implements BasicRepositoryI<T> {
     });
   }
 
+  upsert(item: T): Promise<T> {
+    return getManager()
+        .getRepository<T>(this._entityClass)
+        .save(item);
+  }
+
   // update(item : T, id: string) {
   //     return getManager().getRepository<T>(this.tableName).update(item, )
   // }

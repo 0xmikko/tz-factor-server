@@ -1,28 +1,19 @@
-import {TypeORMRepository} from './typeORMRepository';
 import {Bond, BondsRepositoryI} from '../core/bonds';
 import {injectable} from 'inversify';
-import {getManager} from 'typeorm';
 
 @injectable()
-export class BondsRepository extends TypeORMRepository<Bond>
-  implements BondsRepositoryI {
-  constructor() {
-    super(Bond);
+export class BondsRepository implements BondsRepositoryI {
+  private _bonds: Map<number, Bond> = new Map<number, Bond>();
+
+  list(): Bond[] {
+    return Array.from(this._bonds.values());
   }
 
-  list(): Promise<Bond[] | undefined> {
-    return getManager()
-      .getRepository<Bond>(Bond)
-      .find({relations: ['issuer']});
+  retrieve(id: number): Bond | undefined {
+    return this._bonds.get(id);
   }
 
-  retrieve(id: string): Promise<Bond | undefined> {
-    return getManager()
-        .getRepository<Bond>(Bond)
-        .findOne(id, {relations: ['issuer']});
+  update(bondIndex: number, b: Bond) {
+    this._bonds.set(bondIndex, b);
   }
-
-
-
-
 }

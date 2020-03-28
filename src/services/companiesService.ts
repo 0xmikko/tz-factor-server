@@ -2,6 +2,7 @@ import {
   Company,
   CompaniesRepositoryI,
   CompaniesServiceI,
+  UpsertCompanyProfileDTO,
 } from '../core/company';
 import {inject, injectable} from 'inversify';
 import {TYPES} from '../types';
@@ -32,5 +33,26 @@ export class CompaniesService implements CompaniesServiceI {
     return this._repository.findOne(id);
   }
 
-  update(userId: string, data: Company): void {}
+  update(userId: string, data: UpsertCompanyProfileDTO): Promise<Company> {
+    return new Promise<Company>(async resolve => {
+      const profile = (await this._repository.findOne(userId)) || new Company();
+      const updatedProfile = {
+        ...profile,
+        id: userId,
+        name: data.name,
+        orgType: data.orgType,
+        industry: data.industry,
+        founder: data.founder,
+        headquaters: data.headquaters,
+        numberOfEmployees: data.numberOfEmployees,
+        product: data.product,
+        revenue: data.revenue,
+        website: data.website,
+      };
+
+      const result = await this._repository.upsert(updatedProfile);
+      console.log(result)
+      resolve(result);
+    });
+  }
 }

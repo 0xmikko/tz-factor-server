@@ -56,6 +56,19 @@ function transferBonds(const tParams: transferBondParameters; var store : storag
     b.balance[Tezos.sender] := abs(ownerBondBalance - tParams.value);
     b.balance[tParams.recepient] := recepientBalance + tParams.value;
     store.bonds[tParams.bondIndex] := b;
+
+    const e : transferEvent = record [
+        date      = Tezos.now;
+        sender    = Tezos.sender;
+        recepient = tParams.recepient;
+        value     = tParams.value;
+        isMoney   = False;
+        bondIndex = tParams.bondIndex;
+    ];
+    
+    store.events := e # store.events;
+
+
 }  with ((nil : list (operation)), store)
 
 // ExecuteBond
@@ -79,5 +92,27 @@ function executeBond(const tParams: executeBondParameters; var store : storage) 
     b.balance[Tezos.sender] := abs(ownerBondBalance - tParams.value);
     b.balance[b.issuer] := issuerBondBalance + tParams.value;
     store.bonds[tParams.bondIndex] := b;
+
+    const e : transferEvent = record [
+        date      = Tezos.now;
+        sender    = Tezos.sender;
+        recepient = b.issuer;
+        value     = tParams.value;
+        isMoney   = False;
+        bondIndex = tParams.bondIndex;
+    ];
+    
+    store.events := e # store.events;
+
+    const e : transferEvent = record [
+        date      = Tezos.now;
+        sender    = b.issuer;
+        recepient = Tezos.sender;
+        value     = tParams.value;
+        isMoney   = True;
+        bondIndex = 0n;
+    ];
+
+    store.events := e # store.events;
 
 }  with ((nil : list (operation)), store)

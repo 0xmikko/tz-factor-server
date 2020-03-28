@@ -2,75 +2,76 @@ import {
   Payment,
   PaymentsServiceI,
   PaymentsRepositoryI,
-  PaymentCreateDTO, PaymentListItem,
+  PaymentContractEvent,
 } from '../core/payments';
 import {inject, injectable} from 'inversify';
-import {getRepository} from 'typeorm';
-import {Account} from '../core/accounts';
-import {TYPES} from "../types";
-import {Bond} from "../core/bonds";
+import {TYPES} from '../types';
+import {SCManager} from '../repository/smartContractManager';
+import {AccountsRepositoryI} from '../core/accounts';
+import {BondsRepositoryI} from '../core/bonds';
 
 @injectable()
 export class PaymentsService implements PaymentsServiceI {
   private _repository: PaymentsRepositoryI;
+  private _accountsRepository: AccountsRepositoryI;
+  private _bondsRepository: BondsRepositoryI;
 
   public constructor(
     @inject(TYPES.PaymentsRepository) repository: PaymentsRepositoryI,
+    @inject(TYPES.AccountsRepository) accountsRepository: AccountsRepositoryI,
+    @inject(TYPES.BondsRepository) bondsRepository: BondsRepositoryI,
   ) {
     this._repository = repository;
+    this._accountsRepository = accountsRepository;
+    this._bondsRepository = bondsRepository;
   }
 
-  pay(userId: string, dto: PaymentCreateDTO): Promise<string | undefined> {
-    return new Promise<string>(async (resolve, reject) => {
-
-      const fromAccount = await getRepository<Account>(Account).findOne(dto.from,
-          {relations: ['company']});
-
-      const toAccount = await getRepository<Account>(Account).findOne(dto.to,
-          {relations: ['company']});
-
-      const bond = await getRepository<Bond>(Bond).findOne(dto.bond,
-          {relations: ['issuer', 'shares'], });
-
-      console.log(fromAccount, toAccount, bond);
-
-      // if (!toCompany) {
-      //   reject("Can't find account");
-      //   return;
-      // }
-      //
-      // if (toCompany?.userId !== userId) {
-      //   reject('Operations with this account forbidden for your id');
-      //   return;
-      // }
-      //
-      // if (!toCompany?.company) {
-      //   reject('No company associacted wuth this accound was found');
-      //   return;
-      // }
-      //
-      // const payment = await this._repository.insert({
-      //   id: uuidv4(),
-      //   issuer: toCompany?.company,
-      //   matureDate: new Date(dto.matureDate),
-      //   amount: dto.amount,
-      //   payments: [],
-      // });
-      //
-      // console.log(payment);
-
-      resolve("payment");
-      return;
-    });
-  }
-
-  listByUser(userId: string): Promise<PaymentListItem[] | undefined>  {
+  listByUser(userId: string): Payment[] {
     return this._repository.listByUser(userId);
   }
 
-  findById(userId: string, id: string): Promise<Payment | undefined> {
-    return this._repository.retrieve(id);
+  update(): Promise<void> {
+    return new Promise<void>(async resolve => {
+      const events: Payment[] = [];
+      const contractEvents = SCManager.getManager().events;
+
+      let count = 0;
+      for (const e of contractEvents) {
+        const p = await this.updateItem(count.toString(), e);
+        console.log('PP=>', p);
+        events.push(p);
+        count++;
+      }
+
+      this._repository.updateEvents(events);
+      console.log('EVENTSSS:', contractEvents, events);
+      resolve();
+    });
   }
 
+  private updateItem(id: string, dto: PaymentContractEvent): Promise<Payment> {
+    return new Promise<Payment>(async resolve => {
+      const senderAccount = await this._accountsRepository.findOne(dto.sender);
+      const recipientAccount = await this._accountsRepository.findOne(
+        dto.recepient,
+      );
+      const bond = !dto.isMoney
+        ? this._bondsRepository.retrieve(dto.bondIndex.toNumber())
+        : undefined;
 
+      console.log(bond)
+
+      const p: Payment = {
+        id,
+        date: dto.date,
+        sender: senderAccount,
+        recipient: recipientAccount,
+        amount: dto.value.toNumber(),
+        isMoney: dto.isMoney,
+        bond: bond,
+      };
+
+      resolve(p);
+    });
+  }
 }

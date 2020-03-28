@@ -18,8 +18,20 @@ function transferMoney(const tParams: transferMoneyParameters; var store: storag
   
     if fromValue < tParams.value then failwith ("Not enought money to transfer")
     else {
+        
         store.balance[Tezos.sender] := abs(fromValue - tParams.value);
         store.balance[tParams.recepient] := toValue + tParams.value;
+
+        const e : transferEvent = record [
+            date      = Tezos.now;
+            sender    = Tezos.sender;
+            recepient = tParams.recepient;
+            value     = tParams.value;
+            isMoney   = True;
+            bondIndex =  0n;
+        ];
+        store.events := e # store.events;
+
     }
 
 } with ((nil : list (operation)), store)

@@ -2,6 +2,8 @@ import SocketIO, {Socket} from 'socket.io';
 import socketioJwt from 'socketio-jwt';
 import config from '../config/config';
 import {tokenData} from '../core/profile';
+import {Role} from "../core/company";
+import {SCManager} from "../repository/smartContractManager";
 
 export type socketListeners = Record<string, (...args: any[]) => Promise<void>>;
 
@@ -10,8 +12,9 @@ export interface SocketController {
   getListeners: (
     socket: Socket,
     userId: string,
-    role: string,
+    role: Role,
   ) => socketListeners;
+  update: () => Promise<void>;
 }
 
 export interface SocketWithToken extends SocketIO.Socket {
@@ -19,13 +22,11 @@ export interface SocketWithToken extends SocketIO.Socket {
 }
 
 export class SocketRouter {
-  private readonly sockets: Record<string, Socket>;
-  private _controllers: SocketController[];
+  private readonly socketsPool: Record<string, Socket> = {};
+  private readonly _controllers: SocketController[];
 
   constructor(controllers: SocketController[]) {
-    this.sockets = {};
     this._controllers = [...controllers];
-    console.log(this._controllers);
   }
 
   connect(io: SocketIO.Server) {
@@ -37,17 +38,29 @@ export class SocketRouter {
         decodedPropertyName: 'tData',
       }),
     ).on('authenticated', this._onNewAuthSocket.bind(this));
-    console.log(this._controllers);
   }
 
+  // Runs process of updating information on all controllers
+  update() : Promise<void> {
+    return new Promise<void>(async (resolve) => {
+      await SCManager.getManager().updateData();
+      for(const c of this._controllers) {
+        await c.update();
+        console.log((c.namespace))
+      }
+      resolve()
+    })
+  }
+
+  // Connect new socket to pool
   private _onNewAuthSocket(socket: SocketWithToken) {
     console.log(this);
 
     const userId = socket.tData.user_id;
     const role = socket.tData.role;
 
-    // Add new socket in sockets connection array
-    this.sockets[userId] = socket;
+    // Add new socket in socketsPool connection array
+    this.socketsPool[userId] = socket;
     console.log(`[SOCKET.IO] : user ${userId} connected`);
 
     // Middleware to show all incoming requests
@@ -60,7 +73,7 @@ export class SocketRouter {
     socket.on('disconnect', () => {
       //this socket is authenticated, we are good to handle more events from it.
       console.log(`buy ${userId} with role ${role}`);
-      delete this.sockets[userId];
+      delete this.socketsPool[userId];
     });
 
     // Add listeners from all controllers

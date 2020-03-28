@@ -1,32 +1,27 @@
-import {Column, Entity, ManyToOne, OneToMany, PrimaryColumn} from 'typeorm';
+import {Entity, ManyToOne, PrimaryColumn} from 'typeorm';
 import {BasicRepositoryI} from './basic';
-import { Company } from './company';
-import {Payment} from "./payments";
+import {Company, Role} from './company';
 
 @Entity()
 export class Account {
   @PrimaryColumn()
   id: string;
 
-  // @Column({type: 'int64'})
-  // amount: number;
-
-  @ManyToOne(type => Company, company => company.accounts)
+  @ManyToOne(
+    type => Company,
+    company => company.accounts,
+  )
   company: Company;
 
-  @OneToMany(type=>Payment, payment => payment.from)
-  paymentsFrom?: Payment[];
-
-  @OneToMany(type=>Payment, payment => payment.to)
-  paymentsTo?: Payment[];
-
+  amount?: number;
 }
 
-export interface AccountCreateDTO {
-  id: string
+export interface AccountDTO {
+  id: string;
+  opHash: string;
 }
 
-export const accountCreateDTOSchema = {
+export const accountDTOSchema = {
   type: 'object',
   required: ['id'],
   properties: {
@@ -36,12 +31,21 @@ export const accountCreateDTOSchema = {
   },
 };
 
-
 export interface AccountsRepositoryI extends BasicRepositoryI<Account> {
-  listAccountsWithCompanies() : Promise<Account[] | undefined>;
+  register(companyType: Role, dto: Account): Promise<Boolean>;
+  deposit(id: string): Promise<boolean>;
+  getCompanyByAccount(id: string): Promise<Company>;
+  listAccountsWithCompanies(): Promise<Account[] | undefined>;
+  update(id: string, a: Account): void;
 }
 
 export interface AccountsServiceI {
-  create(userId: string, dto: AccountCreateDTO): Promise<string| undefined>
-  list(userId: string): Promise<Account[] | undefined>
-};
+  create(
+    userId: string,
+    role: Role,
+    dto: AccountDTO,
+  ): Promise<string | undefined>;
+  deposit(id: string): Promise<boolean>;
+  list(): Promise<Account[] | undefined>;
+  update(): Promise<void>;
+}

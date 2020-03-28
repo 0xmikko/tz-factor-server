@@ -1,4 +1,4 @@
-export type Role = "ISSUER" | "SUPPLIER" | "INVESTOR";
+import {Role} from "./company";
 
 export interface tokenData {
     user_id: string;

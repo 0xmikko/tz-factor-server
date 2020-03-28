@@ -5,11 +5,21 @@ type bond is record [
     balance: map(address, nat);
 ]
 
+type transferEvent is record [
+  date: timestamp;
+  sender: address;
+  recepient: address;
+  value: nat;
+  isMoney: bool;
+  bondIndex: nat;
+]
+
 type storage is record [
     owner: address;
     balance: map(address, nat);
     issuers: map(address, bool);
     bonds: map(nat, bond);
+    events: list(transferEvent);
 ]
 
 type return is list (operation) * storage

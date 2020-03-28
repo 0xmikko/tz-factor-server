@@ -1,21 +1,22 @@
 # Create user
 ligo dry-run main.ligo --syntax pascaligo main --sender=tz1TGu6TN5GSez2ndXXeDX6LgUDvLzPLqgYV \
 "RegisterUser((\"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" : address))" \
-"record [ 
+"record [
     owner = (\"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" : address);
     balance  = (map [] : map(address, nat));
     issuers = (map [] : map(address, bool));
-    bonds= (map[] : map(nat, bonds));
+    bonds= (map[] : map(nat, bond));
      ]"
+
 
 # Create Issuer
 ligo dry-run main.ligo --syntax pascaligo main --sender=tz1TGu6TN5GSez2ndXXeDX6LgUDvLzPLqgYV \
 "RegisterIssuer((\"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" : address))" \
-"record [ 
+"record [
     owner = (\"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" : address);
     balance  = (map [] : map(address, nat));
     issuers = (map [] : map(address, bool));
-    bonds= (map[] : map(nat, bonds));
+    bonds= (map[] : map(nat, bond));
      ]"
 
 # Issue new bond
@@ -24,32 +25,32 @@ ligo dry-run main.ligo --syntax pascaligo main --sender=tz1TGu6TN5GSez2ndXXeDX6L
     total=1000n;
     matureDate=Tezos.now;
 ])" \
-"record [ 
+"record [
     owner = (\"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" : address);
-    balance  = map [  
+    balance  = map [
         (\"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" : address) -> (0n);
         (\"tz1TGu6TN5GSez2ndXXeDX6LgUDvLzPLqgYV\" : address) -> (0n);
         ];
     issuers = map [
          (\"tz1TGu6TN5GSez2ndXXeDX6LgUDvLzPLqgYV\" : address) -> (True);
     ];
-    bonds= (map[] : map(nat, bonds));
+    bonds= (map[] : map(nat, bond));
      ]"
 
 
 # Add owner balance
 ligo dry-run main.ligo --syntax pascaligo main --sender=tz1TGu6TN5GSez2ndXXeDX6LgUDvLzPLqgYV \
 "IssueCoins(1599n)" \
-"record [ 
+"record [
     owner = (\"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" : address);
-    balance  = map [  
+    balance  = map [
         (\"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" : address) -> (0n);
         (\"tz1TGu6TN5GSez2ndXXeDX6LgUDvLzPLqgYV\" : address) -> (0n);
         ];
     issuers = map [
          (\"tz1TGu6TN5GSez2ndXXeDX6LgUDvLzPLqgYV\" : address) -> (True);
     ];
-    bonds= (map[] : map(nat, bonds));
+    bonds= (map[] : map(nat, bond));
      ]"
 
 # Transfer Money
@@ -58,16 +59,16 @@ ligo dry-run main.ligo --syntax pascaligo main --sender=tz1KqTpEZ7Yob7QbPE4Hy4Wo
     value = 50n;
     recepient = (\"tz1TGu6TN5GSez2ndXXeDX6LgUDvLzPLqgYV\" : address);
     ])" \
-"record [ 
+"record [
     owner = (\"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" : address);
-    balance  = map [  
+    balance  = map [
         (\"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" : address) -> (100n);
         (\"tz1TGu6TN5GSez2ndXXeDX6LgUDvLzPLqgYV\" : address) -> (0n);
         ];
     issuers = map [
          (\"tz1TGu6TN5GSez2ndXXeDX6LgUDvLzPLqgYV\" : address) -> (True);
     ];
-    bonds= (map[] : map(nat, bonds));
+    bonds= (map[] : map(nat, bond));
      ]"
 
 # Transfer Bonds
@@ -77,9 +78,9 @@ ligo dry-run main.ligo --syntax pascaligo main --sender=tz1KqTpEZ7Yob7QbPE4Hy4Wo
     value = 10n;
     recepient = (\"tz1TGu6TN5GSez2ndXXeDX6LgUDvLzPLqgYV\" : address);
     ])" \
-"record [ 
+"record [
     owner = (\"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" : address);
-    balance  = map [  
+    balance  = map [
         (\"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" : address) -> (100n);
         (\"tz1TGu6TN5GSez2ndXXeDX6LgUDvLzPLqgYV\" : address) -> (0n);
         ];
@@ -95,5 +96,5 @@ ligo dry-run main.ligo --syntax pascaligo main --sender=tz1KqTpEZ7Yob7QbPE4Hy4Wo
                 (\"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" : address) -> 100n;
                 ]
         ];
-    ] 
+    ]
      ]"
