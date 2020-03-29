@@ -105,7 +105,8 @@ export class OffersService implements OffersServiceI {
         resolve(result);
 
       } catch (e) {
-        reject('Cant buy bonds' + e);
+        console.log(e)
+        reject('Cant buy bonds' + e.toString());
       }
     });
   }

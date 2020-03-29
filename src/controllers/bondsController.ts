@@ -4,6 +4,7 @@ import {SocketController, socketListeners} from './socketRouter';
 import {inject, injectable} from 'inversify';
 import {TYPES} from "../types";
 import {Role} from "../core/company";
+import {SCManager} from "../repository/smartContractManager";
 
 
 @injectable()
@@ -25,8 +26,11 @@ export class BondsController implements SocketController {
       // LIST HANDLER
       list: async () => {
         const list = await this._service.list(userId);
+        console.log(list);
         socket.emit(this._namespace + ':updateList', list);
-        await this.update()
+        SCManager.getManager().updateData();
+        await this.update();
+        socket.emit(this._namespace + ':updateList', list);
       },
 
       // RETRIEVE HANDLER

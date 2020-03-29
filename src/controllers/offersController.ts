@@ -52,8 +52,20 @@ export class OffersController implements SocketController {
       },
 
       buy: async (dto: OfferBuyDTO, opHash: string) => {
-        const result = await this._service.buy(userId, dto);
-        socket.emit(this._namespace + ':updateDetails', result);
+        try {
+          const result = await this._service.buy(userId, dto);
+          socket.emit('operations:update', {
+            id: opHash,
+            status: STATUS.SUCCESS,
+          });
+          socket.emit(this._namespace + ':updateDetails', result);
+        } catch (e) {
+          socket.emit('operations:update', {
+            id: opHash,
+            status: STATUS.FAILURE,
+            error: e.toString(),
+          });
+        }
       },
 
 

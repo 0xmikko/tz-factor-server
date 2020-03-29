@@ -14,6 +14,8 @@ export class OffersRepository extends TypeORMRepository<Offer>
   buy(dto: SellBondsContractDTO): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
       try {
+
+        console.log("BUYDTO", dto)
         const contractInstance = await SCManager.getManager().contractInstance;
 
         const op1 = await contractInstance.methods
@@ -31,6 +33,7 @@ export class OffersRepository extends TypeORMRepository<Offer>
 
         resolve();
       } catch (e) {
+        console.log(e)
         reject(e);
       }
     });

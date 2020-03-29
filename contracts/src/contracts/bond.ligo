@@ -139,12 +139,12 @@ function sellBonds(const params: sellBondParameters; var store: storage) : retur
     const b : bond = getBondByIndex(params.bondIndex, store.bonds);
     const sellerBondsBalance : nat = getBondsAmount(b, params.seller);
     const buyerBondsBalance : nat = getBondsAmount(b, params.buyer);
-    if buyerBondsBalance < params.valueBonds then failwith ("Not enough bonds on seller account"); else skip;
+    if sellerBondsBalance < params.valueBonds then failwith ("Not enough bonds on seller account"); else skip;
 
     store.balance[params.buyer] := abs(buyerMoneyBalance  - params.valueMoney);
     store.balance[params.seller] := sellerBondsBalance + params.valueMoney;
 
-    b.balance[params.seller] := abs(buyerBondsBalance - params.valueBonds);
+    b.balance[params.seller] := abs(sellerBondsBalance - params.valueBonds);
     b.balance[params.buyer] := buyerBondsBalance + params.valueBonds;
     store.bonds[params.bondIndex] := b;
 
