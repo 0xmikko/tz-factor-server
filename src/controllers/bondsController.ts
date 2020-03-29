@@ -30,7 +30,7 @@ export class BondsController implements SocketController {
         socket.emit(this._namespace + ':updateList', list);
         SCManager.getManager().updateData();
         await this.update();
-        socket.emit(this._namespace + ':updateList', list);
+        socket.broadcast.emit(this._namespace + ':updateList', list);
       },
 
       // RETRIEVE HANDLER

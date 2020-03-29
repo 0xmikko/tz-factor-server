@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "nodemon",
     "typeorm-gen": "ts-node ./node_modules/.bin/typeorm migration:generate -d ./src/migrations/ ",
-    "typeorm-migrate": "ts-node ./node_modules/.bin/typeorm migration:run"
+    "typeorm-migrate": "ts-node ./node_modules/.bin/typeorm migration:run",
   },
   "dependencies": {
     "@types/cors": "^2.8.6",
