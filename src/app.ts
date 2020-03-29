@@ -42,6 +42,9 @@ export function createApp(config: ConfigParams): Promise<Application> {
     );
 
     app.use(morganLogger);
+    app.get("/", (req, res) => {
+      res.status(200).send("It works!")
+    })
 
     let server = require('http').Server(app);
 
