@@ -19,6 +19,10 @@ import {AccountsRepositoryI, AccountsServiceI} from "./core/accounts";
 import {AccountsRepository} from "./repository/accountsRepository";
 import {AccountsController} from "./controllers/accountsController";
 import {AccountsService} from "./services/accountsService";
+import {OffersRepositoryI, OffersServiceI} from "./core/offers";
+import {OffersRepository} from "./repository/offersRepository";
+import {OffersService} from "./services/offersService";
+import {OffersController} from "./controllers/offersController";
 
 let container = new Container();
 
@@ -41,6 +45,11 @@ container.bind<BondsController>(TYPES.BondsController).to(BondsController);
 container.bind<PaymentsRepositoryI>(TYPES.PaymentsRepository).to(PaymentsRepository).inSingletonScope();
 container.bind<PaymentsServiceI>(TYPES.PaymentsService).to(PaymentsService);
 container.bind<PaymentsController>(TYPES.PaymentsController).to(PaymentsController);
+
+// OFFERS
+container.bind<OffersRepositoryI>(TYPES.OffersRepository).to(OffersRepository).inSingletonScope();
+container.bind<OffersServiceI>(TYPES.OffersService).to(OffersService);
+container.bind<OffersController>(TYPES.OffersController).to(OffersController);
 
 export default container;
 

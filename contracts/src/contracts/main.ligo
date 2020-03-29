@@ -39,7 +39,8 @@ type parameter is
 | TransferMoney of transferMoneyParameters
 | IssueBond of bondIssueParameter
 | TransferBonds of transferBondParameters
-| ExecuteBond of executeBondParameters;
+| ExecuteBond of executeBondParameters
+| SellBonds of sellBondParameters;
 
 function main (const action: parameter; var store: storage) : return is 
   case action of
@@ -51,5 +52,6 @@ function main (const action: parameter; var store: storage) : return is
   | IssueBond (bondParams) -> issueBond (bondParams, store)
   | TransferBonds (transferBondsParams) -> transferBonds (transferBondsParams, store)
   | ExecuteBond (executeBondParameters) -> executeBond (executeBondParameters, store)
+  | SellBonds (sellBondsParams) -> sellBonds (sellBondsParams, store)
 
   end

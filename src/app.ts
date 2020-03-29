@@ -11,6 +11,7 @@ import {PaymentsController} from './controllers/paymentsController';
 import {AccountsController} from './controllers/accountsController';
 import container from './config.inversify';
 import {TYPES} from './types';
+import {OffersController} from './controllers/offersController';
 
 export function createApp(config: ConfigParams): Promise<Application> {
   return new Promise<Application>(async resolve => {
@@ -61,11 +62,15 @@ export function createApp(config: ConfigParams): Promise<Application> {
         TYPES.PaymentsController,
       );
 
+      const offersController = container.get<OffersController>(
+        TYPES.OffersController,
+      );
       const socketRouter = new SocketRouter([
         accountsController,
         companiesController,
         bondsController,
         paymentsController,
+        offersController,
       ]);
       socketRouter.connect(io);
       await socketRouter.update();

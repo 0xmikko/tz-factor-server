@@ -16,6 +16,17 @@ type executeBondParameters is record [
     value: nat;
 ]
 
+
+type sellBondParameters is record [
+    bondIndex: nat;
+    valueBonds: nat;
+    valueMoney: nat;
+    seller: address;
+    buyer: address;
+]
+
+
+
 // ============ BOND ISSUERS OPERATIONS
 
 function issueBond(const newBondParam: bondIssueParameter; var store: storage) : return is block{
@@ -116,3 +127,47 @@ function executeBond(const tParams: executeBondParameters; var store : storage) 
     store.events := e # store.events;
 
 }  with ((nil : list (operation)), store)
+
+function sellBonds(const params: sellBondParameters; var store: storage) : return is block{
+    checkSenderIsOwner(store);
+
+    const sellerMoneyBalance : nat = mustGetBalance(params.seller, store);
+    const buyerMoneyBalance : nat = mustGetBalance(params.buyer, store);
+
+    if buyerMoneyBalance  < params.valueMoney then failwith ("Not enough money on buyer account"); else skip;
+
+    const b : bond = getBondByIndex(params.bondIndex, store.bonds);
+    const sellerBondsBalance : nat = getBondsAmount(b, params.seller);
+    const buyerBondsBalance : nat = getBondsAmount(b, params.buyer);
+    if buyerBondsBalance < params.valueBonds then failwith ("Not enough bonds on seller account"); else skip;
+
+    store.balance[params.buyer] := abs(buyerMoneyBalance  - params.valueMoney);
+    store.balance[params.seller] := sellerBondsBalance + params.valueMoney;
+
+    b.balance[params.seller] := abs(buyerBondsBalance - params.valueBonds);
+    b.balance[params.buyer] := buyerBondsBalance + params.valueBonds;
+    store.bonds[params.bondIndex] := b;
+
+    const e : transferEvent = record [
+        date      = Tezos.now;
+        sender    = params.seller;
+        recepient = params.buyer;
+        value     = params.valueBonds;
+        isMoney   = False;
+        bondIndex = params.bondIndex;
+    ];
+    
+    store.events := e # store.events;
+
+    const e : transferEvent = record [
+        date      = Tezos.now;
+        sender    = params.buyer;
+        recepient = params.seller;
+        value     = params.valueMoney;
+        isMoney   = True;
+        bondIndex = 0n;
+    ];
+
+    store.events := e # store.events;
+
+}with ((nil : list (operation)), store)

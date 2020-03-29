@@ -47,10 +47,10 @@ export class AccountsRepository extends TypeORMRepository<Account>
     });
   }
 
-  findOne(id: string) : Promise<Account | undefined> {
+  findOne(id: string): Promise<Account | undefined> {
     return getManager()
-        .getRepository<Account>(Account)
-        .findOne(id, {relations: ['company']});
+      .getRepository<Account>(Account)
+      .findOne(id, {relations: ['company']});
   }
 
   list(): Promise<Account[] | undefined> {
@@ -82,14 +82,14 @@ export class AccountsRepository extends TypeORMRepository<Account>
           .send();
         console.log('[OP1]:', op1);
         await op1.confirmation(1);
-        console.log("[OP1:] Operation confirmed");
+        console.log('[OP1:] Operation confirmed');
 
         const op2 = await contractInstance.methods
           .transferMoney(id, depositAmount)
           .send();
         console.log('[OP2]:', op2);
         await op2.confirmation(1);
-        console.log("[OP2:] Operation confirmed");
+        console.log('[OP2:] Operation confirmed');
         resolve(true);
       } catch (e) {
         reject('Cant deposit account' + e.toString());

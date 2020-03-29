@@ -6,6 +6,7 @@ import Ajv from 'ajv';
 import {TYPES} from '../types';
 import {Role} from '../core/company';
 import {STATUS} from '../core/operations';
+import {SCManager} from '../repository/smartContractManager';
 
 @injectable()
 export class AccountsController implements SocketController {
@@ -50,7 +51,8 @@ export class AccountsController implements SocketController {
               status: STATUS.SUCCESS,
             });
             // TODO: BROADCAST
-            await this.update()
+            await SCManager.getManager().updateData();
+            await this.update();
             const list = await this._service.list();
             socket.emit(this._namespace + ':updateList', list);
           }
@@ -74,7 +76,7 @@ export class AccountsController implements SocketController {
               id: dto.opHash,
               status: STATUS.SUCCESS,
             });
-            await this.update()
+            await this.update();
             const list = await this._service.list();
             socket.emit(this._namespace + ':updateList', list);
           }

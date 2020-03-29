@@ -1,6 +1,7 @@
 import {MichelsonMap} from "@taquito/taquito";
 import {BigNumber} from 'bignumber.js';
 import {Company} from './company';
+import {Offer} from "./offers";
 
 export class Bond {
   id: number;
@@ -9,7 +10,8 @@ export class Bond {
   total: number;
   matureDate: Date;
   balance: Record<string, number>;
-  userBalance?: number;
+  avgInterest?: number;
+  offers?: Offer[];
 }
 
 export interface BondContractDTO {
