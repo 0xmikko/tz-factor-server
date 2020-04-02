@@ -1,5 +1,6 @@
-# tz-factor-server
-Decentralised global factoring platform. Check client part at https://github.com/MikaelLazarev/tz-factor-server
+# TZ-factor
+### Decentralised global factoring platform. 
+
 
 ## Stack
 
