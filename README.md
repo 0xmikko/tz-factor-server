@@ -1,6 +1,11 @@
 # TZ-factor
 ### Decentralised global factoring platform. 
 
+This application was designed from scratch especially for Future of Blockchain Hackathon: https://www.futureofblockchain.co.uk/
+
+Official site: https://tz-factor.com
+
+Video presentation: https://www.youtube.com/watch?v=FzbrxO7-_PU
 
 ## Stack
 
