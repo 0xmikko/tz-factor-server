@@ -4,7 +4,8 @@ import cors from 'cors';
 import {createConnection} from 'typeorm';
 import {CompaniesController} from './controllers/companiesController';
 import {morganLogger} from './middleware/logger';
-
+import bodyParser from "body-parser";
+import jwt from 'express-jwt';
 import {SocketRouter} from './controllers/socketRouter';
 import {BondsController} from './controllers/bondsController';
 import {PaymentsController} from './controllers/paymentsController';
@@ -42,11 +43,36 @@ export function createApp(config: ConfigParams): Promise<Application> {
     );
 
     app.use(morganLogger);
+
+
+    app.use(jwt({
+      secret: config.jwt_secret,
+      credentialsRequired: true,
+      getToken: function fromHeaderOrQuerystring (req) {
+        if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+          return req.headers.authorization.split(' ')[1];
+        } else if (req.query && req.query.token) {
+          return req.query.token;
+        }
+        return null;
+      }
+    }));
+
+    app.use(bodyParser.json());
+
     app.get("/", (req, res) => {
       res.status(200).send("It works!")
     })
 
+    app.post("/company", (req, res) => {
+      console.log("REQ", req)
+      res.send("!")
+    })
+
+
     let server = require('http').Server(app);
+
+
 
     // set up socket.io and bind it to our
     // http server.
@@ -68,6 +94,9 @@ export function createApp(config: ConfigParams): Promise<Application> {
       const offersController = container.get<OffersController>(
         TYPES.OffersController,
       );
+
+
+
       const socketRouter = new SocketRouter([
         accountsController,
         companiesController,

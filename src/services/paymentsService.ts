@@ -55,11 +55,10 @@ export class PaymentsService implements PaymentsServiceI {
       const recipientAccount = await this._accountsRepository.findOne(
         dto.recepient,
       );
+
       const bond = !dto.isMoney
         ? this._bondsRepository.retrieve(dto.bondIndex.toNumber())
         : undefined;
-
-      console.log(bond)
 
       const p: Payment = {
         id,

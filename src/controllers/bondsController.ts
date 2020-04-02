@@ -25,8 +25,8 @@ export class BondsController implements SocketController {
     return {
       // LIST HANDLER
       list: async () => {
+        console.log("LSTRQ",userId)
         const list = await this._service.list(userId);
-        console.log(list);
         socket.emit(this._namespace + ':updateList', list);
         SCManager.getManager().updateData();
         await this.update();
@@ -43,9 +43,6 @@ export class BondsController implements SocketController {
   }
 
   update(): Promise<void> {
-    return new Promise<void>(resolve => {
-      this._service.update();
-      resolve();
-    });
+    return this._service.update();
   }
 }

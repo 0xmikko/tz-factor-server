@@ -38,56 +38,65 @@ export class BondsService implements BondsServiceI {
     return new Promise<void>(async resolve => {
       const bondsData = SCManager.getManager().bonds;
 
-      Object.entries(bondsData).forEach( b =>
-        this.updateItem(parseInt(b[0]), b[1]),
-      );
+      try {
+        for (const b of Object.entries(bondsData)) {
+
+          await this.updateItem(parseInt(b[0]), b[1]);
+        }
+      }catch (e) {
+        console.log("Error during update bonds")
+      }
       resolve();
     });
   }
 
 
-  async updateItem(id: number, dto: BondContractDTO) {
-    const issuer = await this._accountsRepository.getCompanyByAccount(
-      dto.issuer,
-    );
+   updateItem(id: number, dto: BondContractDTO) : Promise<void> {
+     return new Promise<void>(async (resolve) => {
+       const issuer = await this._accountsRepository.getCompanyByAccount(
+           dto.issuer,
+       );
 
-    const balance: Record<string, number> = {};
-    dto.balance.forEach((k, v) => {
-      balance[v] = k.toNumber();
-    });
+       const balance: Record<string, number> = {};
+       dto.balance.forEach((k, v) => {
+         balance[v] = k.toNumber();
+       });
 
-    const offers = await this._offersRepository.listByBond(id);
-    const offersWithInterestRate = offers?.map(o => calcInterest(o, new Date(dto.matureDate)));
-    let avgInterest : number | undefined;
+       const offers = await this._offersRepository.listByBond(id);
+       const offersWithInterestRate = offers?.map(o => calcInterest(o, new Date(dto.matureDate)));
+       let avgInterest: number | undefined;
 
-    // Calculate weighted interest rate
-    if (offersWithInterestRate) {
-      let totalOffers : number = 0;
-      let totalInterest : number = 0;
-      for (const o of offersWithInterestRate) {
-        if (o.interest) {
-          const amountOffered = o.amount - o.sold
-          totalOffers += amountOffered
-          totalInterest += o.interest * amountOffered
-        }
-      }
-      if (totalOffers > 0) {
-        avgInterest = totalInterest / totalOffers;
-      }
-    }
+       // Calculate weighted interest rate
+       if (offersWithInterestRate) {
+         let totalOffers: number = 0;
+         let totalInterest: number = 0;
+         for (const o of offersWithInterestRate) {
+           if (o.interest) {
+             const amountOffered = o.amount - o.sold
+             totalOffers += amountOffered
+             totalInterest += o.interest * amountOffered
+           }
+         }
+         if (totalOffers > 0) {
+           avgInterest = totalInterest / totalOffers;
+         }
+       }
 
-    const bond: Bond = {
-      id,
-      issuerAccount: dto.issuer,
-      issuer,
-      total: dto.total.toNumber(),
-      balance,
-      matureDate: new Date(dto.matureDate),
-      offers: offersWithInterestRate,
-      avgInterest
-    };
+       const bond: Bond = {
+         id,
+         issuerAccount: dto.issuer,
+         issuer,
+         total: dto.total.toNumber(),
+         balance,
+         matureDate: new Date(dto.matureDate),
+         offers: offersWithInterestRate,
+         avgInterest
+       };
 
-    console.log('update', id, bond);
-    this._repository.update(id, bond);
-  }
+       console.log('update', id, bond);
+       this._repository.update(id, bond);
+       resolve();
+
+     })
+   }
 }

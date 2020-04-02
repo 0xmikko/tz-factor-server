@@ -70,22 +70,26 @@ export class OffersService implements OffersServiceI {
   buy(userId: string, dto: OfferBuyDTO): Promise<Offer | undefined> {
     return new Promise<Offer | undefined>(async (resolve, reject) => {
       try {
+
+        console.log("QQ1")
         // is user has ths account?
         const company = await this._accountRepository.getCompanyByAccount(
           dto.account,
         );
+
+        console.log("QQ2", company)
         if (userId !== company.id) {
           reject("You cant create offer from account you've not register");
           return;
         }
-
+        console.log("QQ2")
         // Check that offer exists
         const offer = await this._repository.findOne(dto.offerId);
         if (!offer) {
           reject('Cant find an offer with this id');
           return;
         }
-
+        console.log("QQ3")
         const contractDTO: SellBondsContractDTO = {
           bondIndex: offer.bondId,
           buyer: dto.account,
@@ -95,7 +99,7 @@ export class OffersService implements OffersServiceI {
         };
         // Interact with smart contract
         await this._repository.buy(contractDTO);
-
+        console.log("QQ4")
         // Update offer on db
         offer.sold += dto.amount;
         if (offer.sold === offer.amount) {

@@ -30,5 +30,5 @@ export interface BondsRepositoryI {
 export interface BondsServiceI {
   findById(id: number): Bond | undefined;
   list(userId: string): Bond[] ;
-  update() : void;
+  update() : Promise<void>;
 }

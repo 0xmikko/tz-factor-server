@@ -45,8 +45,9 @@ export class SocketRouter {
     return new Promise<void>(async (resolve) => {
       await SCManager.getManager().updateData();
       for(const c of this._controllers) {
+        console.log("START=>>>", c.namespace)
         await c.update();
-        console.log((c.namespace))
+        console.log("FINISH=>>>", c.namespace)
       }
       resolve()
     })
