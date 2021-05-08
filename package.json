@@ -39,7 +39,7 @@
     "socketio-auth": "^0.1.1",
     "socketio-jwt": "^4.5.0",
     "ts-node": "^8.7.0",
-    "typeorm": "^0.2.24",
+    "typeorm": "^0.2.25",
     "typescript": "^3.8.3",
     "uuid": "^7.0.2"
   },
